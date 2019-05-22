@@ -21,7 +21,9 @@ frappe.ui.form.on('Bench Settings', {
 			var dialog = new frappe.ui.Dialog({
 				title: 'App Name',
 				fields: [
-					{fieldname: 'app_name', fieldtype: 'Data', reqd:true, label: 'Name of the frappe repo hosted on github'}
+					{fieldname: 'app_name', fieldtype: 'Data', reqd:true, label: 'Name of the app or url to the source git repo'},
+					{fieldname: 'extra_params', fieldtype: 'Data', reqd:false
+						, label: 'Optional parameters to pass to get-app. See bench get-app --help'}
 				]
 			});
 			dialog.set_primary_action(__("Get App"), () => {
@@ -30,7 +32,8 @@ frappe.ui.form.on('Bench Settings', {
 				frm.call("console_command", {
 					key: key,
 					caller: 'get-app',
-					app_name: dialog.fields_dict.app_name.value
+					app_name: dialog.fields_dict.app_name.value,
+					extra_params: dialog.fields_dict.extra_params.value
 				}, () => {
 					dialog.hide();
 				});
@@ -55,7 +58,9 @@ frappe.ui.form.on('Bench Settings', {
 								depends_on: `eval:${String(r['message']['condition'][0] != 'T')}`},
 							{fieldname: 'mysql_password', fieldtype: 'Password',
 								label: 'MySQL Password', reqd: r['message']['condition'][1] != 'T',
-								default: r['message']['root_password'], depends_on: `eval:${String(r['message']['condition'][1] != 'T')}`}
+								default: r['message']['root_password'], depends_on: `eval:${String(r['message']['condition'][1] != 'T')}`},
+							{fieldname: 'extra_params', fieldtype: 'Data', reqd:false
+								, label: 'Optionsl additional parameters to pass to new-site. See bench new-site --help'}
 						],
 					});
 					dialog.set_primary_action(__("Create"), () => {
@@ -82,7 +87,8 @@ frappe.ui.form.on('Bench Settings', {
 											admin_password: dialog.fields_dict.admin_password.value,
 											mysql_password: dialog.fields_dict.mysql_password.value,
 											install_erpnext: install_erpnext,
-											key: key
+											key: key,
+											extra_params: dialog.fields_dict.extra_params.value
 										}
 									});
 									dialog.hide();
@@ -95,17 +101,51 @@ frappe.ui.form.on('Bench Settings', {
 			});
 		});
 		frm.add_custom_button(__("Update"), function(){
-			let key = frappe.datetime.get_datetime_as_string();
-			console_dialog(key);
-			frm.call("console_command", {
-				key: key,
-				caller: "bench_update"
+			var dialog = new frappe.ui.Dialog({
+				title: 'Update',
+				fields: [
+					{fieldname: 'extra_params', fieldtype: 'Data', reqd:false
+						, label: 'Optional parameters to pass to update. See bench update --help'}
+				]
 			});
+			dialog.set_primary_action(__("Update"), () => {
+				let key = frappe.datetime.get_datetime_as_string();
+				console_dialog(key);
+				frm.call("console_command", {
+					key: key,
+					caller: 'bench_update',
+					extra_params: dialog.fields_dict.extra_params.value
+				}, () => {
+					dialog.hide();
+				});
+			});
+			dialog.show();
 		});
 		frm.add_custom_button(__('Sync'), () => {
 			frappe.call({
 				method: 'bench_manager.bench_manager.doctype.bench_settings.bench_settings.sync_all'
 			});
+		});
+		frm.add_custom_button(__("Bench Command"), function(){
+			var dialog = new frappe.ui.Dialog({
+				title: 'Bench Command',
+				fields: [
+					{fieldname: 'bench_params', fieldtype: 'Data', reqd:true
+						, label: 'Command and parameters to bench. See bench --help. (Try putting --help in the input below)'}
+				]
+			});
+			dialog.set_primary_action(__("Run"), () => {
+				let key = frappe.datetime.get_datetime_as_string();
+				console_dialog(key);
+				frm.call("console_command", {
+					key: key,
+					caller: 'bench',
+					extra_params: dialog.fields_dict.bench_params.value
+				}, () => {
+					dialog.hide();
+				});
+			});
+			dialog.show();
 		});
 	}
 });

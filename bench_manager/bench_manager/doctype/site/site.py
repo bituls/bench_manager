@@ -134,7 +134,7 @@ class Site(Document):
 			"uninstall_app": ["bench --site {site_name} uninstall-app {app_name} --yes".format(site_name=self.name, app_name=app_name)],
 			"drop_site": ["bench drop-site {site_name} --root-password {mysql_password}".format(site_name=self.name, mysql_password=mysql_password)]
 		}
-		frappe.enqueue('bench_manager.bench_manager.utils.run_command',
+		frappe.enqueue('bench_manager.bench_manager.utils.run_command', queue='long',
 			commands=commands[caller],
 			doctype=self.doctype,
 			key=key,
@@ -203,17 +203,17 @@ def verify_password(site_name, mysql_password):
 	return "console"
 
 @frappe.whitelist()
-def create_site(site_name, install_erpnext, mysql_password, admin_password, key):
+def create_site(site_name, install_erpnext, mysql_password, admin_password, key, extra_params):
 	verify_whitelisted_call()
-	commands = ["bench new-site --mariadb-root-password {mysql_password} --admin-password {admin_password} {site_name}".format(site_name=site_name,
-		admin_password=admin_password, mysql_password=mysql_password)]
+	commands = ["bench new-site --mariadb-root-password {mysql_password} --admin-password {admin_password} {extra_params} {site_name}".format(site_name=site_name,
+		admin_password=admin_password, mysql_password=mysql_password, extra_params=extra_params)]
 	if install_erpnext == "true":
 		with open('apps.txt', 'r') as f:
 			app_list = f.read()
 		if 'erpnext' not in app_list:
 			commands.append("bench get-app erpnext")
 		commands.append("bench --site {site_name} install-app erpnext".format(site_name=site_name))
-	frappe.enqueue('bench_manager.bench_manager.utils.run_command',
+	frappe.enqueue('bench_manager.bench_manager.utils.run_command', queue='long',
 		commands=commands,
 		doctype="Bench Settings",
 		key=key

@@ -5,7 +5,7 @@
 
 import frappe
 from frappe.model.document import Document
-from subprocess import check_output, Popen, PIPE, STDOUT
+from subprocess import check_output, Popen, PIPE, STDOUT, CalledProcessError
 import os, re, time, shlex
 from bench_manager.bench_manager.utils import verify_whitelisted_call, safe_decode
 
@@ -56,7 +56,10 @@ class App(Document):
 			with open(apps_file, 'w') as f:
 				f.writelines(apps)
 			if self.app_name != '':
-				check_output(shlex.split("rm -r ../apps/{app_name}".format(app_name=self.app_name)))
+				try:
+					check_output(shlex.split("rm -r ../apps/{app_name}".format(app_name=self.app_name)))
+				except CalledProcessError:
+					pass
 
 	def update_app_details(self):
 		pkg_info_file = os.path.join('..', 'apps', self.app_name, '{app_name}.egg-info'.format(app_name=self.app_name), 'PKG-INFO')

@@ -17,6 +17,7 @@ var console_dialog = (key) => {
 	frappe._output_target.innerHTML = '';
 	dialog.show();
 	dialog.$wrapper.find('.modal-dialog').css('width', '800px');
+	dialog.$wrapper.find('.console').addClass('bench-console-body');
 
 	frappe.realtime.on(key, function(output) {
 		if (output==='\r') {
@@ -45,6 +46,14 @@ var console_dialog = (key) => {
 				frappe._last_update = null;
 				if(!frappe.in_progress) {
 					frappe._output_target.innerHTML = frappe._output;
+					let codeHeightPx = dialog.$wrapper.find('code').css('height'),
+					consoleHeightPx = dialog.$wrapper.find('.bench-console-body').css('height'),
+					scroll = parseInt(codeHeightPx.replace('px', '')) - parseInt(consoleHeightPx.replace('px', ''));
+					scroll += 20; // Hack: Add a small abitrary number padding to get to the very end.
+					
+					if(scroll > 0){
+						dialog.$wrapper.find('.bench-console-body').scrollTop(scroll);
+					}
 				}
 			}, 200);
 		}

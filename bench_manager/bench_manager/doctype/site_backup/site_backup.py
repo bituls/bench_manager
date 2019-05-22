@@ -58,7 +58,7 @@ def restore_backup(doctype, docname, on_a_new_site, existing_site, new_site_name
 		command += " --with-private-files ../{backup_file_path}_private_files.tar".format(backup_file_path=backup.file_path)
 	command += " {password_suffix}".format(password_suffix=password_suffix)
 	commands.append(command)
-	frappe.enqueue('bench_manager.bench_manager.utils.run_command',
+	frappe.enqueue('bench_manager.bench_manager.utils.run_command', queue='long',
 		commands=commands,
 		doctype=doctype,
 		key=key,
