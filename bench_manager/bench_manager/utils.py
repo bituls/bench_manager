@@ -24,12 +24,20 @@ def run_command(commands, doctype, key, cwd='..', docname=' ', after_command=Non
 	frappe.db.commit()
 	frappe.publish_realtime(key, "Executing Command:\n{logged_command}\n\n".format(logged_command=logged_command), user=frappe.session.user)
 	status = 'Failed'
+	buffer = []
 	try:
 		for command in commands:
-			terminal = Popen(shlex.split(command), stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd)
+			terminal = Popen(shlex.split(command), stdin=PIPE, stdout=PIPE, stderr=STDOUT, cwd=cwd, universal_newlines=True)
 			for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-				frappe.publish_realtime(key, c, user=frappe.session.user)
+				buffer.append(c)
+				if '\n' == c:
+					frappe.publish_realtime(key, ''.join(buffer), user=frappe.session.user)
+					buffer = []
 				console_dump += c
+			# Write out pending if any (there may be no newline?)
+			if len(buffer):
+				frappe.publish_realtime(key, ''.join(buffer), user=frappe.session.user)
+				buffer = []
 
 		if not terminal.wait():
 			status = 'Success'
