@@ -227,3 +227,17 @@ def sync_all(in_background=False):
 	frappe.enqueue('bench_manager.bench_manager.doctype.bench_settings.bench_settings.sync_backups')
 	frappe.set_value('Bench Settings', None, 'last_sync_timestamp', frappe.utils.time.time())
 
+def do_restart(key):
+	cmd = ["bash", "-c", "sleep 5 && pkill -o honcho &"]
+	doc = frappe.get_doc({'doctype': 'Bench Manager Command', 'key': key, 'source': 'BenchSettings:Restart',
+	'command': ' '.join(cmd), 'console': '', 'status': 'Success'})
+	doc.insert()
+	frappe.db.commit()
+	return subprocess.call(cmd)
+
+@frappe.whitelist()
+def restart_bench(key):
+	verify_whitelisted_call()
+	frappe.enqueue('bench_manager.bench_manager.doctype.bench_settings.bench_settings.do_restart', key=key)
+	frappe.msgprint('Restart scheduled within the next 5 seconds.')
+

@@ -147,5 +147,19 @@ frappe.ui.form.on('Bench Settings', {
 			});
 			dialog.show();
 		});
+		frm.add_custom_button(__('Restart Bench'), () => {
+			frappe.confirm(__('Warning!!!! Are you sure you want to restart the bench service? The service will restart automatically ' +
+			' but you may loose access to the system!!'),
+          		() => {
+					let key = frappe.datetime.get_datetime_as_string();
+            		frappe.call({
+						method: 'bench_manager.bench_manager.doctype.bench_settings.bench_settings.restart_bench',
+						args: {
+							key: key
+						}
+					});
+          		}
+          	);
+		});
 	}
 });

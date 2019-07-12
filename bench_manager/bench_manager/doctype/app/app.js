@@ -63,7 +63,7 @@ frappe.ui.form.on('App', {
 					caller: "apply-stash"
 				});
 			});
-			frm.add_custom_button(__('Pull & Rebase'), function(){
+			frm.add_custom_button(__('Pull'), function(){
 				frappe.call({
 					method: 'bench_manager.bench_manager.doctype.app.app.get_remotes',
 					args: {
@@ -74,13 +74,13 @@ frappe.ui.form.on('App', {
 						var dialog = new frappe.ui.Dialog({
 							title: 'Select Remote',
 							fields: [
-								{fieldname: 'remote_name', fieldtype: 'Select', 'options': r.message, 'reqd':1, 'label':'Select remote to pull and rebase from'}
+								{fieldname: 'remote_name', fieldtype: 'Select', 'options': r.message, 'reqd':1, 'label':'Select remote to pull from'}
 							],
 						});
-						dialog.set_primary_action(__("Pull & Rebase"), () => {
+						dialog.set_primary_action(__("Pull"), () => {
 							let key = frappe.datetime.get_datetime_as_string();
 							console_dialog(key);
-							frm.call("pull_rebase", {
+							frm.call("pull", {
 								key: key,
 								remote: dialog.fields_dict.remote_name.value
 							}, () => {
