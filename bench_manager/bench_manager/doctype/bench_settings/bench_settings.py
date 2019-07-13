@@ -233,6 +233,7 @@ def do_restart(key):
 	'command': ' '.join(cmd), 'console': '', 'status': 'Success'})
 	doc.insert()
 	frappe.db.commit()
+	import subprocess
 	return subprocess.call(cmd)
 
 @frappe.whitelist()
