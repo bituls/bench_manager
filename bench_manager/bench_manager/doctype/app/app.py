@@ -107,7 +107,7 @@ class App(Document):
 			"delete_branch": ["git branch -D {branch_name}".format(branch_name=branch_name)],
 			"git_fetch": ["git fetch --all"],
 			"track-remote": ["git checkout -b {branch_name} -t {remote}".format(branch_name=branch_name, remote=remote)],
-			"pull": ["git pull {remote} {branch_name}".format(branch_name=branch_name, remote=remote)],
+			"pull": ["git pull"],
 			"commit": ["git add .", 'git commit -m "{commit_msg}"'.format(commit_msg=commit_msg)],
 			"stash": ["git add .", "git stash"],
 			"apply-stash": ["git stash apply"]
