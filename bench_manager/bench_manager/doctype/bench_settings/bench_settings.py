@@ -43,7 +43,7 @@ class BenchSettings(Document):
 		self.frappe_git_branch = safe_decode(check_output("git rev-parse --abbrev-ref HEAD".split(),
 			cwd=os.path.join('..', 'apps', 'frappe'))).strip('\n')
 
-	def console_command(self, key, caller, app_name=None, branch_name=None, extra_params=None):
+	def console_command(self, key, caller, app_name="", branch_name="", extra_params=""):
 		commands = {
 			"bench_update": ["bench update {extra_params}".format(extra_params=extra_params)],
 			"switch_branch": [""],
