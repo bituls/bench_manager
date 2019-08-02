@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Frappé and contributors
 # For license information, please see license.txt
-
+from __future__ import unicode_literals
 
 import frappe
 from frappe.model.document import Document
@@ -80,5 +80,7 @@ def verify_whitelisted_call():
 		raise ValueError("This site does not have bench manager installed.")
 
 def safe_decode(string, encoding = 'utf-8'):
+	if isinstance(string, str):
+		return string
 	return string.decode(encoding, errors='replace')
 
