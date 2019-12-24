@@ -130,7 +130,7 @@ frappe.ui.form.on('Bench Settings', {
 			var dialog = new frappe.ui.Dialog({
 				title: 'Bench Command',
 				fields: [
-					{fieldname: 'bench_params', fieldtype: 'Data', reqd:true
+					{fieldname: 'bench_params', fieldtype: 'Small Text', reqd:true
 						, label: 'Command and parameters to bench. See bench --help. (Try putting --help in the input below)'}
 				]
 			});
